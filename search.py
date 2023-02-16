@@ -254,8 +254,8 @@ def breadth_first_graph_search(problem):
                 if problem.goal_test(child.state):
                     return child
                 frontier.append(child)
+                
     return None
-
 
 def best_first_graph_search(problem, f, display=False):
     """Search the nodes with the lowest f scores first.
