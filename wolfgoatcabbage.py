@@ -1,28 +1,66 @@
 from search import *
 # YOUR CODE GOES HERE
 
-class WolfGoatCabbage():
-    class WolfGoatCabbage:
-        def __init__(self):
-            self.initial = ({'F', 'W', 'G', 'C'}, set())
-            self.goal = (set(), {'F', 'W', 'G', 'C'})
-        
-        def actions(self, state):
-            if 'W' in state[0] and 'G' in state[0] and 'F' not in state[0]:
+class WolfGoatCabbage:
+    def __init__(self):
+        self.initial = frozenset([frozenset(['F', 'W', 'G', 'C']), frozenset([])])
+        self.goal = frozenset([frozenset([]), frozenset(['F', 'W', 'G', 'C'])])
+
+    def goal_test(self, state):
+        return state == self.goal
+
+    def result(self, state, action):
+        state = [set(s) for s in state]
+        if 'F' in state[0]:
+            src, dest = 0, 1
+        else:
+            src, dest = 1, 0
+        if action == 'WG':
+            assert 'W' in state[src] and 'G' in state[src]
+            state[src].remove('W')
+            state[dest].add('W')
+            state[src].remove('G')
+            state[dest].add('G')
+        elif action == 'GC':
+            assert 'G' in state[src] and 'C' in state[src]
+            state[src].remove('G')
+            state[dest].add('G')
+            state[src].remove('C')
+            state[dest].add('C')
+        elif action == 'W':
+            assert 'W' in state[src]
+            state[src].remove('W')
+            state[dest].add('W')
+        elif action == 'C':
+            assert 'C' in state[src]
+            state[src].remove('C')
+            state[dest].add('C')
+        state = [frozenset(s) for s in state]
+        return tuple(state)
+
+    def actions(self, state):
+        state = [set(s) for s in state]
+        possible_actions = []
+        if 'F' in state[0]:
+            src, dest = 0, 1
+        else:
+            src, dest = 1, 0
+        for item in state[src]:
+            if item != 'F':
+                new_state = [set(s) for s in state]
+                new_state[src].remove(item)
+                new_state[dest].add(item)
+                if self.is_safe_state([frozenset(s) for s in new_state]):
+                    possible_actions.append(item)
+        return possible_actions
+
+    def is_safe_state(self, state):
+        for side in state:
+            if 'W' in side and 'G' in side and 'F' not in side:
                 return False
-            elif 'G' in state[0] and 'C' in state[0] and 'F' not in state[0]:
+            if 'G' in side and 'C' in side and 'F' not in side:
                 return False
-            elif 'W' in state[1] and 'G' in state[1] and 'F' not in state[1]:
-                return False
-            elif 'G' in state[1] and 'C' in state[1] and 'F' not in state[1]:
-                return False
-            else:
-                return True
-        
-        def result(self, state):
-           
-        def goal_test(self, state):
-            return state == self.goal
+        return True
 
 if __name__ == '__main__':
     wgc = WolfGoatCabbage()
